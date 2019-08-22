@@ -1,7 +1,8 @@
 package com.gjie.netty.server;
 
+import com.gjie.netty.ServerInitEventDelegater;
 import com.gjie.netty.handler.HttpNettyServerHandler;
-import com.gjie.netty.handler.json.HttpJsonRequestDecoder;
+import com.gjie.netty.handler.SimpleHttpRequestDecoder;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -10,6 +11,7 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
@@ -36,12 +38,14 @@ public class NettyServer {
                         protected void initChannel(SocketChannel socketChannel) throws Exception {
                             socketChannel.pipeline().addLast(new HttpRequestDecoder());
                             socketChannel.pipeline().addLast(new HttpObjectAggregator(65536));
-                            socketChannel.pipeline().addLast(new HttpJsonRequestDecoder());
+                            socketChannel.pipeline().addLast(new SimpleHttpRequestDecoder());
                             socketChannel.pipeline().addLast(new HttpResponseEncoder());
                             socketChannel.pipeline().addLast(new ChunkedWriteHandler());
                             socketChannel.pipeline().addLast(new HttpNettyServerHandler());
                         }
                     });
+            ServerInitEventDelegater serverInitEventDelegater = new ServerInitEventDelegater();
+            serverInitEventDelegater.init();
             //绑定端口，同步等待成功（channelFuture用于异步操作的通知回调）
             ChannelFuture channelFuture = serverBootstrap.bind(port).sync();
             //等待服务端监听端口关闭（等待服务端链路关闭之后，main函数退出）

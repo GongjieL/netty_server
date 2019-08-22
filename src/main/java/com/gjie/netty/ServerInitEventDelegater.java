@@ -1,13 +1,18 @@
 package com.gjie.netty;
 
 import com.gjie.netty.annotion.HttpWeb;
+import com.gjie.netty.annotion.RequestBody;
 import com.gjie.netty.annotion.RequestMapping;
+import com.gjie.netty.annotion.ResponseBody;
+import com.gjie.netty.cache.impl.UrlMethodCache;
 import com.gjie.netty.constant.InitEvent;
 import com.gjie.netty.constant.NettyRequestMethod;
-import com.gjie.netty.request.DetailedHttpRequest;
+import com.gjie.netty.http.HttpData;
+import com.gjie.netty.http.HttpDetailContent;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -15,6 +20,7 @@ import java.util.List;
  * @date 2019/8/22 11:29 AM
  */
 public class ServerInitEventDelegater {
+
     public void init() {
         List<String> scanPackages = PropertiesReaderDelegater.getProperty(InitEvent.SCAN_PACKAGES);
         if (scanPackages == null || scanPackages.size() == 0) {
@@ -25,6 +31,7 @@ public class ServerInitEventDelegater {
         if (classes.isEmpty()) {
             return;
         }
+        List<HttpDetailContent> httpDetailContents = new ArrayList<HttpDetailContent>();
         for (Class aClass : classes) {
             if (aClass.getAnnotation(HttpWeb.class) == null) {
                 continue;
@@ -48,14 +55,36 @@ public class ServerInitEventDelegater {
                 if (parentUrl != null) {
                     url = parentUrl + url;
                 }
-                DetailedHttpRequest detailedHttpRequest = new DetailedHttpRequest();
-                detailedHttpRequest.setUrl(url);
-                detailedHttpRequest.setNettyRequestMethod(requestMethod);
-                detailedHttpRequest.setParentRequestMethod(parentRequestMethod);
-                detailedHttpRequest.setMethod(method);
+                HttpDetailContent httpDetailContent = new HttpDetailContent();
+                httpDetailContent.setUrl(url);
+                httpDetailContent.setNettyRequestMethod(requestMethod);
+                httpDetailContent.setParentRequestMethod(parentRequestMethod);
+                httpDetailContent.setMethod(method);
+                //获取参数注解
+                RequestBody requestBody = null;
+                Class parameterClass = null;
+                Parameter[] parameters = method.getParameters();
+                if (parameters != null) {
+                    for (Parameter parameter : parameters) {
+                        RequestBody parameterAnnotation = parameter.getAnnotation(RequestBody.class);
+                        requestBody = parameterAnnotation;
+                        parameterClass = parameter.getClass();
+                        break;
+                    }
+                }
+                if (requestBody != null) {
+                    httpDetailContent.setRequestData(new HttpData(requestBody.format(), parameterClass));
+                }
+                //获取返回参数
+                ResponseBody responseBody = method.getAnnotation(ResponseBody.class);
+                if (requestBody != null) {
+                    httpDetailContent.setResponseData(new HttpData(responseBody.format(), method.getReturnType()));
+                }
+                httpDetailContents.add(httpDetailContent);
             }
         }
         //刷入缓存
-
+        UrlMethodCache urlMethodCache = new UrlMethodCache();
+        urlMethodCache.importData(httpDetailContents);
     }
 }

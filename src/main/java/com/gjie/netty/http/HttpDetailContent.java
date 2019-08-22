@@ -1,18 +1,16 @@
-package com.gjie.netty.request;
+package com.gjie.netty.http;
 
 import com.gjie.netty.constant.NettyRequestMethod;
 
 import java.lang.reflect.Method;
 
-/**
- * @author j_gong
- * @date 2019/8/22 6:57 PM
- */
-public class DetailedHttpRequest {
+public class HttpDetailContent {
     private NettyRequestMethod parentRequestMethod;
     private String url;
     private NettyRequestMethod nettyRequestMethod;
     private Method method;
+    private HttpData requestData;
+    private HttpData responseData;
 
     public NettyRequestMethod getParentRequestMethod() {
         return parentRequestMethod;
@@ -44,5 +42,21 @@ public class DetailedHttpRequest {
 
     public void setMethod(Method method) {
         this.method = method;
+    }
+
+    public HttpData getRequestData() {
+        return requestData;
+    }
+
+    public void setRequestData(HttpData requestData) {
+        this.requestData = requestData;
+    }
+
+    public HttpData getResponseData() {
+        return responseData;
+    }
+
+    public void setResponseData(HttpData responseData) {
+        this.responseData = responseData;
     }
 }

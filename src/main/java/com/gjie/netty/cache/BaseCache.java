@@ -10,9 +10,11 @@ import java.util.concurrent.ConcurrentHashMap;
  * @date 2019/8/22 7:13 PM
  */
 public abstract class BaseCache<T> {
-    private List<T> basicData;
 
-    private Map<String, Map<String, T>> dataMap;
+    private static List basicData;
+
+    private static Map<String, Map<String, Object>> dataMap;
+
     /**
      * 获取数据
      *
@@ -21,23 +23,30 @@ public abstract class BaseCache<T> {
     protected abstract List<T> getBasicData();
 
     public T getData(String fieldType, String primaryKey) throws IllegalAccessException, NoSuchFieldException {
-        if (basicData == null) {
-            initData();
+        Map<String, Object> data = null;
+        synchronized (this.getClass()) {
+            if (basicData == null) {
+                initData();
+            }
+            data = dataMap.get(fieldType);
         }
-        Map<String, T> data = dataMap.get(fieldType);
         if (data == null) {
-            data = new ConcurrentHashMap<String, T>();
-            for (T basicDatum : basicData) {
+            data = new ConcurrentHashMap<String, Object>();
+            for (Object basicDatum : basicData) {
                 Field field = basicDatum.getClass().getField(fieldType);
                 String key = field.get(basicDatum).toString();
-                data.put(key,basicDatum);
+                data.put(key, basicDatum);
             }
         }
-        return data.get(primaryKey);
+        return (T)data.get(primaryKey);
     }
 
     private void initData() {
         basicData = getBasicData();
-        dataMap = new ConcurrentHashMap<>();
+        dataMap = new ConcurrentHashMap<String, Map<String, Object>>();
+    }
+
+    public synchronized void importData(List<T> basicData) {
+        this.basicData = basicData;
     }
 }
