@@ -5,7 +5,6 @@ import com.gjie.netty.constant.InitEvent;
 
 import java.io.File;
 import java.lang.annotation.Annotation;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,24 +16,8 @@ import java.util.stream.Collectors;
  */
 public class AnalysisDelegater {
 
-    public String init(String resourceValue) {
-        String[] basePackages = resourceValue.split(InitEvent.PACKAGE_SPLIT_SEPARATOR);
-        if (basePackages == null || basePackages.length == 0) {
-            return null;
-        }
-        List<Class> classes = listFitClasses(basePackages);
-        for (Class aClass : classes) {
-            Annotation annotation = aClass.getAnnotation(HttpWeb.class);
-            if(annotation==null){
-                continue;
-            }
-
-        }
-        return null;
-    }
-
-    private List<Class> listFitClasses(String[] basePackages) {
-        if (basePackages == null || basePackages.length == 0) {
+    public static List<Class> listFitClasses(List<String> basePackages) {
+        if (basePackages == null || basePackages.size() == 0) {
             return null;
         }
         final URL rootUrl = Thread.currentThread().getContextClassLoader().getResource("");
@@ -61,15 +44,8 @@ public class AnalysisDelegater {
         return fitClasses;
     }
 
-    public static void main(String[] args) throws MalformedURLException {
-        List<Class> classes = new AnalysisDelegater().listFitClasses(new String[]{"com.*.*.*"});
-//        URL rootUrl = Thread.currentThread().getContextClassLoader().getResource("");
-//        File rootFile = new File(rootUrl.getPath());
-//        List<String> list = listPackageClasses(rootFile, "com.*.netty.*.json", rootFile.getPath());
-        System.out.println(classes);
-    }
 
-    public List<String> listPackageClasses(File file, String matchSymbol, String rootPath) {
+    private static List<String> listPackageClasses(File file, String matchSymbol, String rootPath) {
         List<String> list = new ArrayList<String>();
         String compareSymbol = matchSymbol;
         int index = matchSymbol.indexOf(".");
