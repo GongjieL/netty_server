@@ -68,7 +68,7 @@ public class ServerInitEventDelegater {
                     for (Parameter parameter : parameters) {
                         RequestBody parameterAnnotation = parameter.getAnnotation(RequestBody.class);
                         requestBody = parameterAnnotation;
-                        parameterClass = parameter.getClass();
+                        parameterClass = parameter.getType();
                         break;
                     }
                 }

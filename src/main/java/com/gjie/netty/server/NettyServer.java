@@ -23,6 +23,7 @@ public class NettyServer {
     }
 
     public void bind(int port) {
+        long start = System.currentTimeMillis();
         //接受客户端的连接
         EventLoopGroup bossEventLoopGroup = new NioEventLoopGroup();
         //网络的读写
@@ -48,6 +49,7 @@ public class NettyServer {
             serverInitEventDelegater.init();
             //绑定端口，同步等待成功（channelFuture用于异步操作的通知回调）
             ChannelFuture channelFuture = serverBootstrap.bind(port).sync();
+            System.out.println(String.format("server is started: %s ms", System.currentTimeMillis() - start));
             //等待服务端监听端口关闭（等待服务端链路关闭之后，main函数退出）
             channelFuture.channel().closeFuture().sync();
         } catch (InterruptedException e) {

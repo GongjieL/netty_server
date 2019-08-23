@@ -1,16 +1,15 @@
-package com.gjie.netty.request;
+package com.gjie.netty.http;
 
 import com.alibaba.fastjson.JSONObject;
 import com.gjie.netty.http.HttpDetailContent;
+import com.gjie.netty.http.resp.HttpExceptionResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
 
-public class NettyHttpRequest {
+public class NettyHttpHandleData {
     private FullHttpRequest request;
     private Object object;
     private HttpDetailContent httpDetailContent;
-    private Integer code;
-
-
+    private HttpExceptionResponse httpResponseMessage;
 
     public FullHttpRequest getRequest() {
         return request;
@@ -41,18 +40,19 @@ public class NettyHttpRequest {
         this.httpDetailContent = httpDetailContent;
     }
 
-    public Integer getCode() {
-        return code;
+    public HttpExceptionResponse getHttpResponseMessage() {
+        return httpResponseMessage;
     }
 
-    public void setCode(Integer code) {
-        this.code = code;
+    public void setHttpResponseMessage(HttpExceptionResponse httpExceptionResponse) {
+        this.httpResponseMessage = httpExceptionResponse;
     }
 
-    public NettyHttpRequest(FullHttpRequest request, Object object, HttpDetailContent httpDetailContent, Integer code) {
+
+    public NettyHttpHandleData(FullHttpRequest request, Object object, HttpDetailContent httpDetailContent, HttpExceptionResponse httpExceptionResponse) {
         this.request = request;
         this.object = object;
         this.httpDetailContent = httpDetailContent;
-        this.code = code;
+        this.httpResponseMessage = httpExceptionResponse;
     }
 }
