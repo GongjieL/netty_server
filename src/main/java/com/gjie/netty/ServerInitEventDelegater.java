@@ -53,9 +53,9 @@ public class ServerInitEventDelegater {
                 String url = requestMapping.url();
                 NettyRequestMethod requestMethod = requestMapping.requestMethod();
                 if (parentUrl != null) {
-                    url = new StringBuilder().append(appName).append(parentUrl).append(url).toString();
+                    url = new StringBuilder().append("/").append(appName).append(parentUrl).append(url).toString();
                 } else {
-                    url = new StringBuilder().append(appName).append(url).toString();
+                    url = new StringBuilder().append("/").append(appName).append(url).toString();
                 }
                 HttpDetailContent httpDetailContent = new HttpDetailContent();
                 httpDetailContent.setUrl(url);
