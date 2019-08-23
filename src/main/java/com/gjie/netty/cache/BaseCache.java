@@ -32,21 +32,24 @@ public abstract class BaseCache<T> {
         }
         if (data == null) {
             data = new ConcurrentHashMap<String, Object>();
+            Field field = basicData.get(0).getClass().getDeclaredField(fieldType);
+            field.setAccessible(true);
             for (Object basicDatum : basicData) {
-                Field field = basicDatum.getClass().getField(fieldType);
                 String key = field.get(basicDatum).toString();
                 data.put(key, basicDatum);
             }
+            dataMap.put(fieldType,data);
         }
         return (T)data.get(primaryKey);
     }
 
     private void initData() {
         basicData = getBasicData();
-        dataMap = new ConcurrentHashMap<String, Map<String, Object>>();
     }
 
     public synchronized void importData(List<T> basicData) {
         this.basicData = basicData;
+        dataMap = new ConcurrentHashMap<String, Map<String, Object>>();
+
     }
 }
