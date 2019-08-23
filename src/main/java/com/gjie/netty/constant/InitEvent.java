@@ -7,6 +7,10 @@ package com.gjie.netty.constant;
 public class InitEvent {
     public final static String SCAN_PACKAGES = "scanPackages";
 
+    public final static String APP_NAME = "appName";
+
+    public final static String APP_PORT = "appPort";
+
     public final static String PACKAGE_SPLIT_SEPARATOR = ".";
 
     public final static String COMMON_SYSMBOL = "*";

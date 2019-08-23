@@ -21,7 +21,7 @@ import java.util.List;
  */
 public class ServerInitEventDelegater {
 
-    public void init() {
+    public void init(String appName) {
         List<String> scanPackages = PropertiesReaderDelegater.getProperty(InitEvent.SCAN_PACKAGES);
         if (scanPackages == null || scanPackages.size() == 0) {
             return;
@@ -53,7 +53,9 @@ public class ServerInitEventDelegater {
                 String url = requestMapping.url();
                 NettyRequestMethod requestMethod = requestMapping.requestMethod();
                 if (parentUrl != null) {
-                    url = parentUrl + url;
+                    url = new StringBuilder().append(appName).append(parentUrl).append(url).toString();
+                } else {
+                    url = new StringBuilder().append(appName).append(url).toString();
                 }
                 HttpDetailContent httpDetailContent = new HttpDetailContent();
                 httpDetailContent.setUrl(url);

@@ -1,6 +1,8 @@
 package com.gjie.netty.server;
 
+import com.gjie.netty.PropertiesReaderDelegater;
 import com.gjie.netty.ServerInitEventDelegater;
+import com.gjie.netty.constant.InitEvent;
 import com.gjie.netty.handler.HttpNettyServerHandler;
 import com.gjie.netty.handler.SimpleHttpRequestDecoder;
 import io.netty.bootstrap.ServerBootstrap;
@@ -19,7 +21,7 @@ import io.netty.handler.stream.ChunkedWriteHandler;
 
 public class NettyServer {
     public static void main(String[] args) {
-        new NettyServer().bind(8080);
+        new NettyServer().bind(Integer.valueOf(PropertiesReaderDelegater.getProperty(InitEvent.APP_PORT).get(0)));
     }
 
     public void bind(int port) {
@@ -46,7 +48,7 @@ public class NettyServer {
                         }
                     });
             ServerInitEventDelegater serverInitEventDelegater = new ServerInitEventDelegater();
-            serverInitEventDelegater.init();
+            serverInitEventDelegater.init(PropertiesReaderDelegater.getProperty(InitEvent.APP_NAME).get(0));
             //绑定端口，同步等待成功（channelFuture用于异步操作的通知回调）
             ChannelFuture channelFuture = serverBootstrap.bind(port).sync();
             System.out.println(String.format("server is started: %s ms", System.currentTimeMillis() - start));
